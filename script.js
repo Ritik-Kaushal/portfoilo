@@ -180,20 +180,71 @@ function showNotification(message, type = 'info') {
     }, 5000);
 }
 
-// Typing animation for hero title
-function typeWriter(element, text, speed = 100) {
-    let i = 0;
-    element.innerHTML = '';
+// Typing animation for hero title - Fixed to handle HTML tags with continuous loop
+function typeWriter(element, text, speed = 100, deleteSpeed = 50) {
+    // Extract text content and HTML structure
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = text;
+    const fullText = tempDiv.textContent || tempDiv.innerText || '';
     
-    function type() {
-        if (i < text.length) {
-            element.innerHTML += text.charAt(i);
+    // Find the span element
+    const spanElement = tempDiv.querySelector('.highlight');
+    const spanText = spanElement ? spanElement.textContent : '';
+    
+    // Get text before and after the highlight
+    const beforeHighlight = fullText.substring(0, fullText.indexOf(spanText));
+    const afterHighlight = fullText.substring(fullText.indexOf(spanText) + spanText.length);
+    
+    let i = 0;
+    let isDeleting = false;
+    
+    function animate() {
+        if (!isDeleting && i < beforeHighlight.length) {
+            // Typing before highlight
+            element.innerHTML = beforeHighlight.substring(0, i + 1);
             i++;
-            setTimeout(type, speed);
+            setTimeout(animate, speed);
+        } else if (!isDeleting && i < beforeHighlight.length + spanText.length) {
+            // Typing highlight part
+            const spanProgress = i - beforeHighlight.length;
+            element.innerHTML = beforeHighlight + '<span class="highlight">' + spanText.substring(0, spanProgress + 1) + '</span>';
+            i++;
+            setTimeout(animate, speed);
+        } else if (!isDeleting && i < fullText.length) {
+            // Typing after highlight
+            const afterProgress = i - beforeHighlight.length - spanText.length;
+            element.innerHTML = beforeHighlight + '<span class="highlight">' + spanText + '</span>' + afterHighlight.substring(0, afterProgress + 1);
+            i++;
+            setTimeout(animate, speed);
+        } else if (!isDeleting) {
+            // Finished typing, wait then start deleting
+            isDeleting = true;
+            setTimeout(animate, 2000); // Wait 2 seconds before deleting
+        } else if (isDeleting && i > 0) {
+            // Deleting text
+            if (i > beforeHighlight.length + spanText.length) {
+                // Delete after highlight
+                const afterProgress = i - beforeHighlight.length - spanText.length;
+                element.innerHTML = beforeHighlight + '<span class="highlight">' + spanText + '</span>' + afterHighlight.substring(0, afterProgress - 1);
+            } else if (i > beforeHighlight.length) {
+                // Delete highlight part
+                const spanProgress = i - beforeHighlight.length;
+                element.innerHTML = beforeHighlight + '<span class="highlight">' + spanText.substring(0, spanProgress - 1) + '</span>';
+            } else {
+                // Delete before highlight
+                element.innerHTML = beforeHighlight.substring(0, i - 1);
+            }
+            i--;
+            setTimeout(animate, deleteSpeed);
+        } else {
+            // Finished deleting, restart typing
+            isDeleting = false;
+            element.innerHTML = '';
+            setTimeout(animate, 500); // Small pause before restarting
         }
     }
     
-    type();
+    animate();
 }
 
 // Initialize typing animation when page loads
@@ -201,7 +252,8 @@ window.addEventListener('load', () => {
     const heroTitle = document.querySelector('.hero-title');
     if (heroTitle) {
         const originalText = heroTitle.innerHTML;
-        typeWriter(heroTitle, originalText, 50);
+        // Apply typing animation with proper HTML handling - continuous loop
+        typeWriter(heroTitle, originalText, 80, 40);
     }
 });
 
