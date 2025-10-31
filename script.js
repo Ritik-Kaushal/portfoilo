@@ -41,28 +41,7 @@ window.addEventListener('scroll', () => {
     }
 });
 
-// Intersection Observer for scroll animations
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
-    });
-}, observerOptions);
-
-// Observe elements for scroll animations
-document.addEventListener('DOMContentLoaded', () => {
-    const animatedElements = document.querySelectorAll('.skill-category, .project-card, .about-text, .contact-info');
-    animatedElements.forEach(el => {
-        el.classList.add('fade-in');
-        observer.observe(el);
-    });
-});
+// Scroll animations removed
 
 // Active navigation link highlighting
 window.addEventListener('scroll', () => {
@@ -180,92 +159,10 @@ function showNotification(message, type = 'info') {
     }, 5000);
 }
 
-// Typing animation for hero title - Fixed to handle HTML tags with continuous loop
-function typeWriter(element, text, speed = 100, deleteSpeed = 50) {
-    // Extract text content and HTML structure
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = text;
-    const fullText = tempDiv.textContent || tempDiv.innerText || '';
-    
-    // Find the span element
-    const spanElement = tempDiv.querySelector('.highlight');
-    const spanText = spanElement ? spanElement.textContent : '';
-    
-    // Get text before and after the highlight
-    const beforeHighlight = fullText.substring(0, fullText.indexOf(spanText));
-    const afterHighlight = fullText.substring(fullText.indexOf(spanText) + spanText.length);
-    
-    let i = 0;
-    let isDeleting = false;
-    
-    function animate() {
-        if (!isDeleting && i < beforeHighlight.length) {
-            // Typing before highlight
-            element.innerHTML = beforeHighlight.substring(0, i + 1);
-            i++;
-            setTimeout(animate, speed);
-        } else if (!isDeleting && i < beforeHighlight.length + spanText.length) {
-            // Typing highlight part
-            const spanProgress = i - beforeHighlight.length;
-            element.innerHTML = beforeHighlight + '<span class="highlight">' + spanText.substring(0, spanProgress + 1) + '</span>';
-            i++;
-            setTimeout(animate, speed);
-        } else if (!isDeleting && i < fullText.length) {
-            // Typing after highlight
-            const afterProgress = i - beforeHighlight.length - spanText.length;
-            element.innerHTML = beforeHighlight + '<span class="highlight">' + spanText + '</span>' + afterHighlight.substring(0, afterProgress + 1);
-            i++;
-            setTimeout(animate, speed);
-        } else if (!isDeleting) {
-            // Finished typing, wait then start deleting
-            isDeleting = true;
-            setTimeout(animate, 2000); // Wait 2 seconds before deleting
-        } else if (isDeleting && i > 0) {
-            // Deleting text
-            if (i > beforeHighlight.length + spanText.length) {
-                // Delete after highlight
-                const afterProgress = i - beforeHighlight.length - spanText.length;
-                element.innerHTML = beforeHighlight + '<span class="highlight">' + spanText + '</span>' + afterHighlight.substring(0, afterProgress - 1);
-            } else if (i > beforeHighlight.length) {
-                // Delete highlight part
-                const spanProgress = i - beforeHighlight.length;
-                element.innerHTML = beforeHighlight + '<span class="highlight">' + spanText.substring(0, spanProgress - 1) + '</span>';
-            } else {
-                // Delete before highlight
-                element.innerHTML = beforeHighlight.substring(0, i - 1);
-            }
-            i--;
-            setTimeout(animate, deleteSpeed);
-        } else {
-            // Finished deleting, restart typing
-            isDeleting = false;
-            element.innerHTML = '';
-            setTimeout(animate, 500); // Small pause before restarting
-        }
-    }
-    
-    animate();
-}
+// Hero section fade-in animations are handled via CSS
+// Typing animation removed for a more elegant, professional look
 
-// Initialize typing animation when page loads
-window.addEventListener('load', () => {
-    const heroTitle = document.querySelector('.hero-title');
-    if (heroTitle) {
-        const originalText = heroTitle.innerHTML;
-        // Apply typing animation with proper HTML handling - continuous loop
-        typeWriter(heroTitle, originalText, 80, 40);
-    }
-});
-
-// Parallax effect for hero section
-window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset;
-    const hero = document.querySelector('.hero');
-    if (hero) {
-        const rate = scrolled * -0.5;
-        hero.style.transform = `translateY(${rate}px)`;
-    }
-});
+// Parallax effect removed - it was causing gap issues between sections
 
 // Skill bars animation
 function animateSkillBars() {
@@ -287,23 +184,7 @@ document.querySelectorAll('.project-card').forEach(card => {
     });
 });
 
-// Smooth reveal animation for sections
-const revealElements = document.querySelectorAll('.section-title, .about-text, .skill-category, .project-card');
-const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-        }
-    });
-}, { threshold: 0.1 });
-
-revealElements.forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(30px)';
-    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-    revealObserver.observe(el);
-});
+// Additional scroll animations handled by the main scrollObserver above
 
 // Add loading animation
 window.addEventListener('load', () => {
